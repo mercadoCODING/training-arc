@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardHeader, CardDescription, CardTitle } from "@/components/ui/card"
-import { Badge } from "lucide-react"
+import { Badge, Briefcase, TrendingUp } from "lucide-react"
 import { Settings, LogOut, Search, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -17,6 +17,12 @@ export default function Dashboard() {
     const handleProfile = () => {
         console.log("Navigate to profile function");
     }
+
+    const jobstats = [
+        { label: "New Jobs Today" , value: 2345, icon: TrendingUp },
+        { label: "Profile Views" , value: 137, icon: User },
+        { label: "Applications", value: 10, icon: Briefcase }
+    ]
 
     return (
         <div className="min-h-screen bg-background">
@@ -42,7 +48,7 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <main className="pt-5 pr-60 pl-60">
-                <div mb-8>
+                <div className="mb-8">
                     <h2 className="text-3xl mb-2">Welcome to JobMatch AI!</h2>
                     <p className="text-muted-foreground">AI-powered job matching based on your experience and skills.</p>
                 </div>
@@ -67,6 +73,70 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
                 )}
+
+                {/* Status Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {jobstats.map((stat, index) => (
+                        <Card key={index}>
+                            <CardContent className="p-6">
+                                <div className="flex items-center space-x-2">
+                                    <stat.icon className="h-5 w-5 text-muted-foreground" />
+                                    <div className="flex-1">
+                                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                        <p className="text-2xl">{stat.value}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {/* Browse Jobs */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center space-x-2">
+                                <Briefcase className="h-5 w-5" />
+                                <span>Browse Jobs</span>
+                            </CardTitle>
+                            <CardDescription>
+                                {hasProfile ? 
+                                    "Find jobs matched to your experience and preference" 
+                                    : "Browse Available Job opportunities"
+                                }
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button>
+                                <Search />
+                                Browse Jobs
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                     {/* Profile Management */}
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center space-x-2">
+                                <User  className="h-5 w-5" />
+                                <span>User Profile</span>
+                            </CardTitle>
+                            <CardDescription>
+                                {hasProfile ? 
+                                    "Update your skills, experince and job preference"
+                                    : "Create your professional profile for better job matching"
+                                }
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button>
+                                <User />
+                                {hasProfile ? "Edit Profile" : "Create Profile"}
+                            </Button>
+                        </CardContent>
+                     </Card>
+                </div>
             </main>
         </div >
     )

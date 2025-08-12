@@ -5,7 +5,7 @@
 import requests #for http requests
 from bs4 import BeautifulSoup #for parsing and extracting info from html content
 
-base_url = f"https://remoteok.com/?action=get_jobs&offset=" #base URL for scraping (incomplete)
+base_url = f"https://remoteok.com/?tags=dev&action=get_jobs&offset=" #base URL for scraping (incomplete)
 # added 'tags=dev&action=get_jobs&offset=20' because of lazy loading issue in using 'https://remoteok.com/remote-dev-jobs'
 # offset = the number of jobs to be skipped, to load further jobs
 # append offsets in offset= to traverse the job cards in the website
@@ -43,7 +43,7 @@ while job_counter < 10000:
         else:
             continue
 
-print(f"found {job_counter+1} jobs!")
+print(f"found {job_counter} jobs!")
 print("finished!")
 
 

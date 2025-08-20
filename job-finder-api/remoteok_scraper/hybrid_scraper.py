@@ -1,9 +1,11 @@
-#web scraper
+#web scraper for remoteok
 #receive html file and parse using beautifulsoup
 #can also choose to receive json and parse json for stability in the case the webpage changes html structure.
 
 import requests #for http requests
 from bs4 import BeautifulSoup #for parsing and extracting info from html content
+import json
+import time
 
 base_url = f"https://remoteok.com/?action=get_jobs&offset=" #base URL for scraping (incomplete)
 # added 'tags=dev&action=get_jobs&offset=20' because of lazy loading issue in using 'https://remoteok.com/remote-dev-jobs'
@@ -16,7 +18,7 @@ headers = {
 
 job_counter = 0
 
-while job_counter < 10000:
+while True:
     complete_url = base_url + str(job_counter) #append the number of jobs found in offset to skip those jobs in the html and load new ones to solve lazy loading issue
     response = requests.get(complete_url, headers=headers) #get request and include headers to avoid being blocked
     soup = BeautifulSoup(response.content, "html.parser") # soup object will parse html content from response into a structured object
@@ -28,22 +30,52 @@ while job_counter < 10000:
 
     for job in job_cards:
         
-        job_counter += 1 #increment counter
         anchor_tag = job.find("a")
         title_tag = anchor_tag.find("h2") #finds <h2> tag inside job card, gets visible text and strips extra whitespace
         #link = "https://www.indeed.com" + job["href"] #extracts URL from <a> tag job["href"] and concatenates to full link
 
         if anchor_tag and title_tag: #not every td element is a job card, check if anchor and h2 tags exist first for filtering
 
+            job_counter += 1 #increment counter
+
             title = title_tag.text.strip()
             job_url = "https://www.remoteok.com"+anchor_tag["href"]
-            print(f"job {job_counter+1}: {title}")
+
+            '''response_2 = requests.get(job_url, headers=headers) #overwrite response with new url to scrape job description
+            soup_2 = BeautifulSoup(response_2.content, "html.parser") #overwrite soup object with new response content
+            div_tag_description = soup_2.find("div", class_ = "description") #following remoteok html format scrape for a div with class = markdown
+            
+            if div_tag_description:
+                div_tag_markdown = div_tag_description.find("div", class_ = "markdown") 
+                if div_tag_markdown:
+                    job_desc = div_tag_markdown.find("p")
+                else:
+                    job_desc = "No markdown tag found"
+            else:
+                job_desc = "No description tag found"
+            '''
+
+            # Step 2: get job page JSON
+            job_resp = requests.get("https://remoteok.com/api", headers=headers)
+            job_soup = BeautifulSoup(job_resp.text, "html.parser")
+            json_script = job_soup.find("script", type="application/ld+json")
+
+            if json_script:
+                job_data = json.loads(json_script.string)
+                job_desc = job_data.get("description", "").strip()
+            else:
+                job_desc = None
+
+            time.sleep(1)  # avoid hammering server
+
+            print(f"job {job_counter}: {title}")
             print(f"url: {job_url}")
+            print(f"job description: {job_desc}")
             print("------------")
         else:
             continue
 
-print(f"found {job_counter+1} jobs!")
+print(f"found {job_counter} jobs!")
 print("finished!")
 
 

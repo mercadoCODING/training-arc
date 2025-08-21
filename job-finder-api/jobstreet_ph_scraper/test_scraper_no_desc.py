@@ -74,7 +74,7 @@ while counter < 3:
 
         print(f"Scraped {len(job_cards)} jobs on this page")
 
-        # --- Try to click "Next" button ---
+        #Try to click "Next" button
         try:
             next_btn = driver.find_element(By.CSS_SELECTOR, "a[aria-label='Next']")
             driver.execute_script("arguments[0].click();", next_btn)

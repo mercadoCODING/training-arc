@@ -12,7 +12,6 @@ public class FetchScrapedDataService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String pythonEndpoint = "";
 
-    //apply lambda
 
     public ScrapedData fetchData(){
         return restTemplate.getForObject(pythonEndpoint, ScrapedData.class);

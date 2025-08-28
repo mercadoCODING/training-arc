@@ -9,7 +9,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 #load pretrained sentence transformer model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+#model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-mpnet-base-v2')
+
 
 #sample resumes:
 
@@ -30,7 +32,7 @@ base_url = "https://ph.jobstreet.com/jobs"
 driver.get(base_url)
 
 job_descriptions = [] #create a list disctionaries with keys title and description
-page_limit = 1  # how many pages to scrape
+page_limit = 5  # how many pages to scrape
 page_counter = 0
 
 
@@ -64,7 +66,12 @@ while page_counter < page_limit:
             except:
                 title = None
 
-            job_descriptions.append({"description":description, "title": title})
+            try:
+                link = card.find_element(By.CSS_SELECTOR, "a[data-automation='jobTitle']").get_attribute("href")
+            except:
+                link = None
+
+            job_descriptions.append({"description":description, "title": title, "link": link})
 
             print(f"Scraped job {idx}: {title}")
 
@@ -95,6 +102,7 @@ job_embeddings= model.encode([f"{job['title']}: {job['description']}" for job in
 
 cosine_scores = util.cos_sim(resume_embedding, job_embeddings) #compute for cosine similarity and stores in list
 
-for idx, (job_title, cosine_score) in enumerate(zip([f"{job['title']}" for job in job_descriptions], cosine_scores[0])):
-    print(f"Job:{job_title}")
-    print(f"Cosine similarity: {cosine_score}\n")
+for idx, (job_title, url, cosine_score) in enumerate(zip([f"{job['title']}" for job in job_descriptions], [f"{job['link']}" for job in job_descriptions] ,cosine_scores[0])):
+    print(f"Job: {job_title}")
+    print(f"Cosine similarity: {cosine_score}")
+    print(f"URL: {url}\n")

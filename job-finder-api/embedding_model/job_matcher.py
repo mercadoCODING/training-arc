@@ -9,13 +9,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 #load pretrained sentence transformer model
-#model = SentenceTransformer('all-MiniLM-L6-v2')
-model = SentenceTransformer('all-mpnet-base-v2')
+#model = SentenceTransformer('all-MiniLM-L6-v2') #faster and lightweight
+model = SentenceTransformer('all-mpnet-base-v2') #more accurate
 
 
 #sample resumes:
 
-resume = """Experienced assistant who is able to transcribe key points, prepare daily calls and meetings, can manage reports, and manage files in a system"""
+resume = """ Software engineer, developer, and problem-solver with a curiosity and passion for learning."""
 
 # Setup Chrome with webdriver-manager
 options = Options()
@@ -103,6 +103,6 @@ job_embeddings= model.encode([f"{job['title']}: {job['description']}" for job in
 cosine_scores = util.cos_sim(resume_embedding, job_embeddings) #compute for cosine similarity and stores in list
 
 for idx, (job_title, url, cosine_score) in enumerate(zip([f"{job['title']}" for job in job_descriptions], [f"{job['link']}" for job in job_descriptions] ,cosine_scores[0])):
-    print(f"Job: {job_title}")
+    print(f"Job {idx}: {job_title}")
     print(f"Cosine similarity: {cosine_score}")
     print(f"URL: {url}\n")

@@ -1,3 +1,6 @@
+#scrapes first 10,000 jobs in jobstreet and store in single JSON file
+
+import json
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -21,7 +24,7 @@ driver = webdriver.Chrome(
 base_url = "https://ph.jobstreet.com/jobs"
 driver.get(base_url)
 
-all_jobs = [] #create a list of dictionaries
+all_jobs = [] #create a list of dictionaries then save data to all_jobs.json
 page_limit = 1  # how many pages to scrape
 page_counter = 0
 
@@ -29,11 +32,14 @@ while page_counter < page_limit:
     page_counter += 1
     print(f"SCRAPING PAGE {page_counter}")
 
-    # Wait for job cards to load
-    job_cards = WebDriverWait(driver, 15).until(
-        EC.presence_of_all_elements_located((By.TAG_NAME, "article"))
+    # Wait for job cards (article tags) to load
+    # WebDriverWait waits for a certain condition such as the presence of an element before proceeding (solution for lazy loaded elements)
+
+    job_cards = WebDriverWait(driver, 15).until( #15 seconds is the maximum time it will wait before timing out
+        EC.presence_of_all_elements_located((By.TAG_NAME, "article")) #waits for all article elements to load (job cards)
     )
 
+    #once all cards have loaded:
     for idx, card in enumerate(job_cards, start=1):
         try:
             # Scroll to the card to ensure it's visible
@@ -43,43 +49,56 @@ while page_counter < page_limit:
             # Click the card to load description
             card.click()
 
-            # Wait for description panel to load and extract description
-            description_elem = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-automation='jobAdDetails']"))
-            )
-            description = description_elem.text.strip()
-
-            # Extract job info from card
+            # Extract title info from card (no need to wait as it is not lazy loaded)
             try:
                 title = card.find_element(By.CSS_SELECTOR, "a[data-automation='jobTitle']").text
             except:
                 title = None
 
+            # Wait for description panel to load and extract description
             try:
-                company = card.find_element(
-                    By.CSS_SELECTOR,
-                    "span._1lns5ab0._6c7qzn50.od4ez80.od4ez81.od4ez81t.od4ez88._1lwlriv4"
-                ).text
+                description_elem = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-automation='jobAdDetails']"))
+            )
+                description = description_elem.text.strip()
+
+            except:
+                description = None
+                
+            try:
+                # wait for element containing company name to load before scraping
+                company_elem = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "span[data-automation='advertiser-name']")
+                    )
+                )
+                company = company_elem.text.strip()
             except:
                 company = None
 
             try:
-                location = card.find_element(
-                    By.CSS_SELECTOR,
-                    "span._1lns5ab0._6c7qzn50.od4ez80.od4ez81.od4ez81t.od4ez86._1lwlriv4"
-                ).text
+                # wait for element containing location to load before scraping
+                location_elem = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "span[data-automation='job-detail-location']")
+                    )
+                )
+                location = location_elem.text.strip()
             except:
                 location = None
 
             try:
-                salary = card.find_element(By.CSS_SELECTOR, "span[data-automation='jobSalary']").text
+                #no need to wait for salary as it is not lazy-loaded
+                salary = card.find_element(By.CSS_SELECTOR, "span[data-automation='jobSalary']").text 
             except:
-                salary = None
+                salary = None #not all job cards show their salaries in jobstreet, expect to see nonetype salary values
 
+                
             try:
+                #same for the job link
                 link = card.find_element(By.CSS_SELECTOR, "a[data-automation='jobTitle']").get_attribute("href")
             except:
-                link = None
+                link = None 
 
             all_jobs.append({ #append all details to job dictionary
                 "title": title,
@@ -109,7 +128,28 @@ while page_counter < page_limit:
 
 driver.quit()
 
-# Print results
-for i, job in enumerate(all_jobs, start=1):
-    print(f"{i}. {job['title']} \nCompany: {job['company']} \nLocation: {job['location']} \n Salary: {job['Salary']}")
-    print(f"Description: {job['description'][:500]}...\n") 
+with open("all_jobs.json", "w", encoding="utf-8") as myJson:
+    json.dump(all_jobs, myJson, indent=4, ensure_ascii=False)
+    #adds 4 indents for cleaner text
+    #keeps non-ascii special chars intact
+
+print("saved to all_jobs.json!")
+print("printing all_jobs.json...")
+
+#read json and load data into container
+with open("all_jobs.json", "r", encoding="utf-8") as myJson:
+    loaded_jobs = json.load(myJson) #loaded into loaded_jobs and becomes list of dictionaries
+
+for idx, job in enumerate(loaded_jobs, start=1):
+    print("-----------------------------------------------------")
+    print(f"Job {idx}: {job['title']}")
+    print(f"Company: {job['company']}")
+    print(f"Location: {job['location']}")
+    print(f"Salary: {job['salary']}")
+    print(f"URL: {job['link']}")
+    print(f"Description: {job['description'][:100]}")
+
+
+
+
+

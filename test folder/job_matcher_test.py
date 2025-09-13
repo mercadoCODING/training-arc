@@ -1,3 +1,5 @@
+# test file only, not used within app
+
 from sentence_transformers import SentenceTransformer, util
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -97,12 +99,14 @@ resume_embedding = model.encode(resume, convert_to_tensor=True) #convert resume 
 
 job_embeddings= model.encode([f"{job['title']}: {job['description']}" for job in job_descriptions], convert_to_tensor=True) 
 
-#unpacks the values of keys title and description into one list (combines title and description into one string for conversion)
+#first param unpacks the values of keys title and description from job_descriptions into one list (combines title and description into one string for conversion)
 #encode method then converts text into tensors/embeddings
+#job_embeddings is technically only one tensor (not a list of embeddings), but each row of the tensor is one job embedding, so it acts like a list
 
-cosine_scores = util.cos_sim(resume_embedding, job_embeddings) #compute for cosine similarity and stores in list
+cosine_scores = util.cos_sim(resume_embedding, job_embeddings) #compute for cosine similarity and store in a single tensor
+#similarly to job_embeddings, cosine_scores acts as a list of scores but is a tensor where each row is a cosine score.
 
-for idx, (job_title, url, cosine_score) in enumerate(zip([f"{job['title']}" for job in job_descriptions], [f"{job['link']}" for job in job_descriptions] ,cosine_scores[0])):
+for idx, (job_title, url, cosine_score) in enumerate(zip([f"{job['title']}" for job in job_descriptions], [f"{job['link']}" for job in job_descriptions], cosine_scores[0])):
     print(f"Job {idx}: {job_title}")
     print(f"Cosine similarity: {cosine_score}")
     print(f"URL: {url}\n")

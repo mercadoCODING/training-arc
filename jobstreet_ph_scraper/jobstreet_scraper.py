@@ -25,7 +25,7 @@ base_url = "https://ph.jobstreet.com/jobs"
 driver.get(base_url)
 
 all_jobs = [] #create a list of dictionaries then save data to all_jobs.json
-page_limit = 1  # how many pages to scrape
+page_limit = 5  # how many pages to scrape
 page_counter = 0
 
 while page_counter < page_limit:

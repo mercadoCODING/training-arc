@@ -20,8 +20,6 @@ export default function Dashboard() {
 
     const jobstats = [
         { label: "New Jobs Today" , value: 2345, icon: TrendingUp },
-        { label: "Profile Views" , value: 137, icon: User },
-        { label: "Applications", value: 10, icon: Briefcase }
     ]
 
     return (
@@ -62,22 +60,22 @@ export default function Dashboard() {
                         <span>Complete Your Profile</span>
                     </CardTitle>
                     <CardDescription className="text-orange-700 dark:text-orange-300">
-                        Set up your experience and preferences to get personalized job recommendations.
+                       Upload your profile to get personalized job recommendations.
                     </CardDescription>
                     </CardHeader>
                     <CardContent>
                     <Button onClick={() => router.push('profile')} className="bg-orange-600 hover:bg-orange-700">
                         <User className="mr-2 h-4 w-4" />
-                        Setup Profile
+                        Upload CV/Resume
                     </Button>
                     </CardContent>
                 </Card>
                 )}
 
                 {/* Status Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="mb-8">
                     {jobstats.map((stat, index) => (
-                        <Card key={index}>
+                        <Card className="w-full">
                             <CardContent className="p-6">
                                 <div className="flex items-center space-x-2">
                                     <stat.icon className="h-5 w-5 text-muted-foreground" />
@@ -91,9 +89,7 @@ export default function Dashboard() {
                     ))}
                 </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {/* Browse Jobs */}
+                {/* Browse Jobs */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center space-x-2">
@@ -115,28 +111,6 @@ export default function Dashboard() {
                         </CardContent>
                     </Card>
 
-                     {/* Profile Management */}
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center space-x-2">
-                                <User  className="h-5 w-5" />
-                                <span>User Profile</span>
-                            </CardTitle>
-                            <CardDescription>
-                                {hasProfile ? 
-                                    "Update your skills, experince and job preference"
-                                    : "Create your professional profile for better job matching"
-                                }
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button>
-                                <User />
-                                {hasProfile ? "Edit Profile" : "Create Profile"}
-                            </Button>
-                        </CardContent>
-                     </Card>
-                </div>
             </main>
         </div >
     )

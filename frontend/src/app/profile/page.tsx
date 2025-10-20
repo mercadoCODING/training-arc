@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
 
 interface ProfileData {
   personalInfo: {
@@ -43,7 +45,10 @@ interface ProfileData {
 export default function ProfilePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [existingProfile, setExistingProfile] = useState<ProfileData | null>(null);
+  const [showMethodChoice, setShowMethodChoice] = useState(true);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isProcessingCV, setIsProcessingCV] = useState(false);
+  const [isProfileUploaded, setIsProfileUploaded] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<ProfileData>({
     personalInfo: {
@@ -77,22 +82,81 @@ export default function ProfilePage() {
   const [newSkill, setNewSkill] = useState('');
 
   // Load existing profile on component mount
-  useEffect(() => {
-    loadExistingProfile();
-  }, []);
 
-  const loadExistingProfile = () => {
-    // In a real app, this would be an API call
-    // For now, we'll check localStorage or use dummy data
+
+
+
+  const handleMethodChoice = (method: 'manual' | 'upload') => {
+    setShowMethodChoice(true);
+    if (method === 'upload') {
+      // Trigger file input
+      document.getElementById('cv-upload')?.click();
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a PDF or Word document');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setUploadedFile(file);
+    console.log('Uploaded file:', file);
+    setIsProfileUploaded(true);
+    setIsProcessingCV(true);
+
     try {
-      const savedProfile = localStorage.getItem('userProfile');
-      if (savedProfile) {
-        const profileData = JSON.parse(savedProfile);
-        setExistingProfile(profileData);
-        setFormData(profileData);
-      }
+      // Simulate AI processing of CV
+      // In a real app, this would call an API to extract data from the CV
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // // Mock extracted data
+      // const extractedData: ProfileData = {
+      //   personalInfo: {
+      //     fullName: 'John Doe',
+      //     email: 'john.doe@example.com',
+      //     phone: '+63 912 345 6789',
+      //     location: 'Manila, Philippines'
+      //   },
+      //   experience: {
+      //     yearsOfExperience: '3-5',
+      //     currentPosition: 'Senior Software Developer',
+      //     industry: 'Technology',
+      //     experienceLevel: 'senior'
+      //   },
+      //   education: {
+      //     degree: "Bachelor's in Computer Science",
+      //     field: 'Computer Science',
+      //     university: 'University of the Philippines',
+      //     graduationYear: '2018'
+      //   },
+      //   skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS', 'Docker'],
+      //   preferences: {
+      //     desiredPosition: 'Senior Software Engineer',
+      //     preferredLocation: 'Manila or Remote',
+      //     salaryRange: '80k-100k',
+      //     jobType: 'full-time',
+      //     workArrangement: 'hybrid'
+      //   }
+      // };
+
+      // setFormData(extractedData);
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('Error processing CV:', error);
+      alert('Error processing CV. Please try manual entry.');
+    } finally {
+      setIsProcessingCV(false);
     }
   };
 
@@ -106,35 +170,30 @@ export default function ProfilePage() {
     }));
   };
 
-  const addSkill = () => {
-    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        skills: [...prev.skills, newSkill.trim()]
-      }));
-      setNewSkill('');
-    }
-  };
+  // const addSkill = () => {
+  //   if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
+  //     setFormData(prev => ({
+  //       ...prev,
+  //       skills: [...prev.skills, newSkill.trim()]
+  //     }));
+  //     setNewSkill('');
+  //   }
+  // };
 
-  const removeSkill = (skillToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
-    }));
-  };
+  // const removeSkill = (skillToRemove: string) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     skills: prev.skills.filter(skill => skill !== skillToRemove)
+  //   }));
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // In a real app, this would be an API call
       localStorage.setItem('userProfile', JSON.stringify(formData));
-      
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Navigate back to dashboard after successful save
       router.push('/dashboard');
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -144,355 +203,97 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    // In a real app, clear auth tokens, etc.
     localStorage.removeItem('userProfile');
     router.push('/login');
   };
 
-  const handleNavigateToDashboard = () => {
-    router.push('/dashboard');
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Search className="h-8 w-8 text-primary" />
-            <h1 className="text-xl">JobMatch AI</h1>
+  // Method choice screen
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border bg-card">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Search className="h-8 w-8 text-primary" />
+              <h1 className="text-xl font-semibold">JobMatch AI</h1>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard">
+                  <Home className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" onClick={handleNavigateToDashboard}>
-              <Home className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Form Content */}
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
-          <h2 className="text-3xl mb-2">
-            {existingProfile ? 'Update Your Profile' : 'Build Your Professional Profile'}
-          </h2>
-          <p className="text-muted-foreground">
-            Help us understand your background to find the perfect job matches for you.
-          </p>
+        <main className="container mx-auto px-4 py-16 max-w-4xl">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold">Build Your Professional Profile</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Personal Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span>Personal Information</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    value={formData.personalInfo.fullName}
-                    onChange={(e) => handleInputChange('personalInfo', 'fullName', e.target.value)}
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.personalInfo.email}
-                    onChange={(e) => handleInputChange('personalInfo', 'email', e.target.value)}
-                    placeholder="john@example.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    value={formData.personalInfo.phone}
-                    onChange={(e) => handleInputChange('personalInfo', 'phone', e.target.value)}
-                    placeholder="+63 912 345 6789"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={formData.personalInfo.location}
-                    onChange={(e) => handleInputChange('personalInfo', 'location', e.target.value)}
-                    placeholder="Manila, Philippines"
-                    required
-                  />
+        <div className="grid md:grid-cols-2 gap-10 max-w-3xl mx-auto">
+          {/* Upload CV Option */}
+          <Card
+            className="cursor-pointer hover:border-primary transition-colors flex flex-col justify-center"
+            onClick={() => handleMethodChoice('upload')}
+          >
+            <CardContent className="p-8 text-center flex flex-col items-center">
+              <div className="mb-6 flex justify-center">
+                <div className="p-5 bg-primary/10 rounded-full">
+                  <Upload className="h-10 w-10 text-primary" />
                 </div>
               </div>
+              <h3 className="text-xl font-semibold mb-3">Upload Your CV</h3>
+              <p className="text-muted-foreground mb-6 max-w-xs">
+                {isProcessingCV
+                  ? 'Our AI is extracting information from your resume'
+                  : 'Let our AI extract information from your resume automatically'}
+              </p>
+              <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground mb-8">
+                <FileText className="h-5 w-5" />
+                <span className="text-green-600">PDF, DOC, DOCX (Max 5MB)</span>
+              </div>
+              <Button className="w-full max-w-xs" size="lg">
+                Upload CV/Resume
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Experience */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Briefcase className="h-5 w-5" />
-                <span>Work Experience</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="yearsOfExperience">Years of Experience</Label>
-                  <Select
-                    value={formData.experience.yearsOfExperience}
-                    onValueChange={(value: any) => handleInputChange('experience', 'yearsOfExperience', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select experience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0-1">0-1 years</SelectItem>
-                      <SelectItem value="1-3">1-3 years</SelectItem>
-                      <SelectItem value="3-5">3-5 years</SelectItem>
-                      <SelectItem value="5-10">5-10 years</SelectItem>
-                      <SelectItem value="10+">10+ years</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="experienceLevel">Experience Level</Label>
-                  <Select
-                    value={formData.experience.experienceLevel}
-                    onValueChange={(value: any) => handleInputChange('experience', 'experienceLevel', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="entry">Entry Level</SelectItem>
-                      <SelectItem value="mid">Mid Level</SelectItem>
-                      <SelectItem value="senior">Senior Level</SelectItem>
-                      <SelectItem value="lead">Lead/Manager</SelectItem>
-                      <SelectItem value="executive">Executive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="currentPosition">Current/Recent Position</Label>
-                  <Input
-                    id="currentPosition"
-                    value={formData.experience.currentPosition}
-                    onChange={(e) => handleInputChange('experience', 'currentPosition', e.target.value)}
-                    placeholder="Software Developer"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="industry">Industry</Label>
-                  <Input
-                    id="industry"
-                    value={formData.experience.industry}
-                    onChange={(e) => handleInputChange('experience', 'industry', e.target.value)}
-                    placeholder="Technology, Healthcare, Finance..."
-                  />
-                </div>
-              </div>
-            </CardContent>
+          {/* Single card for status and buttons */}
+          <Card className="flex flex-col justify-center p-8 max-w-xs mx-auto cursor-pointer hover:border-primary transition-colors">
+            <p className="mb-6 text-center text-lg font-medium">
+              {isProfileUploaded ? 'Profile Uploaded' : 'Please upload profile'}
+            </p>
+            <p className="mb-8 text-center text-muted-foreground truncate">
+              File name: {uploadedFile?.name || 'None'}
+            </p>
+            <div className="flex justify-center space-x-6">
+              <Button variant="secondary" className="w-28 hover:bg-orange-600" size="lg">
+                Cancel
+              </Button>
+              <Button className="w-28" size="lg">
+                Confirm
+              </Button>
+            </div>
           </Card>
+        </div>
 
-          {/* Education */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <GraduationCap className="h-5 w-5" />
-                <span>Education</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="degree">Degree</Label>
-                  <Input
-                    id="degree"
-                    value={formData.education.degree}
-                    onChange={(e) => handleInputChange('education', 'degree', e.target.value)}
-                    placeholder="Bachelor's, Master's, PhD..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="field">Field of Study</Label>
-                  <Input
-                    id="field"
-                    value={formData.education.field}
-                    onChange={(e) => handleInputChange('education', 'field', e.target.value)}
-                    placeholder="Computer Science, Engineering..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="university">University/Institution</Label>
-                  <Input
-                    id="university"
-                    value={formData.education.university}
-                    onChange={(e) => handleInputChange('education', 'university', e.target.value)}
-                    placeholder="University of the Philippines"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="graduationYear">Graduation Year</Label>
-                  <Input
-                    id="graduationYear"
-                    value={formData.education.graduationYear}
-                    onChange={(e) => handleInputChange('education', 'graduationYear', e.target.value)}
-                    placeholder="2023"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Skills */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Skills & Technologies</CardTitle>
-              <CardDescription>
-                Add your technical and professional skills
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex space-x-2">
-                <Input
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  placeholder="e.g., React, Python, Project Management"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                />
-                <Button type="button" onClick={addSkill}>
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.skills.map((skill, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm">
-                    {skill}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="ml-2 h-auto p-0"
-                      onClick={() => removeSkill(skill)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Job Preferences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MapPin className="h-5 w-5" />
-                <span>Job Preferences</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="desiredPosition">Desired Position</Label>
-                  <Input
-                    id="desiredPosition"
-                    value={formData.preferences.desiredPosition}
-                    onChange={(e) => handleInputChange('preferences', 'desiredPosition', e.target.value)}
-                    placeholder="Senior Software Engineer"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="preferredLocation">Preferred Location</Label>
-                  <Input
-                    id="preferredLocation"
-                    value={formData.preferences.preferredLocation}
-                    onChange={(e) => handleInputChange('preferences', 'preferredLocation', e.target.value)}
-                    placeholder="Manila, Remote, Cebu..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="salaryRange">Expected Salary Range</Label>
-                  <Select
-                    value={formData.preferences.salaryRange}
-                    onValueChange={(value: any) => handleInputChange('preferences', 'salaryRange', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select salary range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="20k-40k">₱20,000 - ₱40,000</SelectItem>
-                      <SelectItem value="40k-60k">₱40,000 - ₱60,000</SelectItem>
-                      <SelectItem value="60k-80k">₱60,000 - ₱80,000</SelectItem>
-                      <SelectItem value="80k-100k">₱80,000 - ₱100,000</SelectItem>
-                      <SelectItem value="100k+">₱100,000+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="jobType">Job Type</Label>
-                  <Select
-                    value={formData.preferences.jobType}
-                    onValueChange={(value: any) => handleInputChange('preferences', 'jobType', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select job type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full-time">Full-time</SelectItem>
-                      <SelectItem value="part-time">Part-time</SelectItem>
-                      <SelectItem value="contract">Contract</SelectItem>
-                      <SelectItem value="freelance">Freelance</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="workArrangement">Work Arrangement</Label>
-                <Select
-                  value={formData.preferences.workArrangement}
-                  onValueChange={(value: any) => handleInputChange('preferences', 'workArrangement', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select work arrangement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="onsite">On-site</SelectItem>
-                    <SelectItem value="remote">Remote</SelectItem>
-                    <SelectItem value="hybrid">Hybrid</SelectItem>
-                    <SelectItem value="flexible">Flexible</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={handleNavigateToDashboard}>
-              Cancel
-            </Button>
-            <Button type="submit" size="lg" disabled={isLoading}>
-              {isLoading ? 'Saving...' : (existingProfile ? 'Update Profile' : 'Complete Profile')}
-            </Button>
-          </div>
-        </form>
+        {/* Hidden file input */}
+        <input
+          id="cv-upload"
+          type="file"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
       </main>
-    </div>
-  );
-}
+
+      </div>
+    );
+  }

@@ -18,7 +18,7 @@ export default function Home() {
             <Search className="h-6 w-6 text-primary" />
             <span className="text-lg font-semibold">JobMatch AI</span>
           </div>
-          <Button variant="ghost">Sign In</Button>
+          {/* <Button variant="ghost">Sign In</Button> */}
         </div>
       </header>
 
@@ -58,9 +58,9 @@ export default function Home() {
                 <Zap className="mr-2 h-4 w-4" />
                 Get Started
               </Button>
-              <Button variant="ghost" size="lg" className="px-8 py-3">
+              {/* <Button variant="ghost" size="lg" className="px-8 py-3">
                 What's Unique About Us
-              </Button>
+              </Button> */}
             </div>
           </Link>
 

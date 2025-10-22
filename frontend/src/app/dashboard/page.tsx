@@ -10,13 +10,13 @@ export default function Dashboard() {
     const router = useRouter();
     const [hasProfile, setHasProfile] = useState(false);
 
-    const onLogout = () => {
-        console.log("Logout logic");
-    }
+    // const onLogout = () => {
+    //     console.log("Logout logic");
+    // }
 
-    const handleProfile = () => {
-        console.log("Navigate to profile function");
-    }
+    // const handleProfile = () => {
+    //     console.log("Navigate to profile function");
+    // }
 
     const jobstats = [
         { label: "New Jobs Today" , value: 2345, icon: TrendingUp },
@@ -28,18 +28,20 @@ export default function Dashboard() {
             <header className="border-b border-border bg-card">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                    <Search className="h-8 w-8 text-primary" />
-                    <h1 className="text-xl">JobMatch AI</h1>
+                    <Button onClick={() => router.push('/')} variant="ghost" className="text-xl font-semibold">
+                        <Search className="h-8 w-8 text-primary" />
+                        JobMatchAI
+                    </Button>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Button variant="ghost" onClick={handleProfile}>
+                    {/* <Button variant="ghost" onClick={handleProfile}>
                     <User className="mr-2 h-4 w-4" />
                     </Button>
                     Profile
                     <Button variant="ghost" onClick={onLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
-                    </Button>
+                    </Button> */}
                 </div>
                 </div>
             </header>
@@ -75,7 +77,7 @@ export default function Dashboard() {
                 {/* Status Cards */}
                 <div className="mb-8">
                     {jobstats.map((stat, index) => (
-                        <Card className="w-full">
+                        <Card className="w-full" key={index}>
                             <CardContent className="p-6">
                                 <div className="flex items-center space-x-2">
                                     <stat.icon className="h-5 w-5 text-muted-foreground" />

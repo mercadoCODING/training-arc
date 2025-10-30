@@ -1,6 +1,7 @@
+# Use Python 3.10 slim base image
 FROM python:3.10-slim
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget gnupg unzip curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -12,12 +13,17 @@ RUN wget -q -O /usr/share/keyrings/google-linux-signing-key.gpg https://dl.googl
     && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
+# Set display for headless Chrome
 ENV DISPLAY=:99
 
+# Set working directory
 WORKDIR /app
+
+# Copy scraper code into container
 COPY . .
 
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Run the scraper
 CMD ["python", "jobstreet_scraper.py"]
-

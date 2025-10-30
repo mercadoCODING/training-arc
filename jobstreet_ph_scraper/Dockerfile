@@ -3,7 +3,7 @@ FROM python:3.10-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget gnupg unzip curl ca-certificates \
+    wget gnupg unzip curl ca-certificates git\
     && rm -rf /var/lib/apt/lists/*
 
 # Add Google Chrome repo properly (no apt-key)

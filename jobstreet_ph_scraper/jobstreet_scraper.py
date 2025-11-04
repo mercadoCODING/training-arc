@@ -7,17 +7,24 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import time
+import os
 
 # Setup Chrome with webdriver-manager
 options = Options()
 options.add_argument("--start-maximized") #starts chrome maximized to avoid clickable errors with responsive layouts
 
-options.add_argument("--headless=new")  # Uncomment to run chrome without visible window
+#options.add_argument("--headless=new")  # Uncomment to run chrome without visible window
+
+#Use Linux path if it exists (for cloud hosting), otherwise fall back to Windows (for local testing)
+if os.path.exists("/usr/bin/chromedriver"):
+    CHROME_DRIVER_PATH = "/usr/bin/chromedriver" #Point directly to the ChromeDriver path (installed in docker image)
+else:
+    from webdriver_manager.chrome import ChromeDriverManager
+    CHROME_DRIVER_PATH = ChromeDriverManager().install()
 
 driver = webdriver.Chrome(
-    service=Service(ChromeDriverManager().install()),
+    service=Service(CHROME_DRIVER_PATH),
     options=options
 )
 
@@ -35,7 +42,7 @@ while page_counter < page_limit:
     # Wait for job cards (article tags) to load
     # WebDriverWait waits for a certain condition such as the presence of an element before proceeding (solution for lazy loaded elements)
 
-    job_cards = WebDriverWait(driver, 15).until( #15 seconds is the maximum time it will wait before timing out
+    job_cards = WebDriverWait(driver, 30).until( #30 seconds is the maximum time it will wait before timing out
         EC.presence_of_all_elements_located((By.TAG_NAME, "article")) #waits for all article elements to load (job cards)
     )
 

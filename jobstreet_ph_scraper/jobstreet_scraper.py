@@ -13,7 +13,6 @@ import os
 # Setup Chrome with webdriver-manager
 options = Options()
 options.add_argument("--start-maximized") #starts chrome maximized to avoid clickable errors with responsive layouts
-
 #options.add_argument("--headless=new")  # Uncomment to run chrome without visible window
 
 #Use Linux path if it exists (for cloud hosting), otherwise fall back to Windows (for local testing)
@@ -32,7 +31,7 @@ base_url = "https://ph.jobstreet.com/jobs"
 driver.get(base_url)
 
 all_jobs = [] #create a list of dictionaries then save data to all_jobs.json
-page_limit = 5  # how many pages to scrape
+page_limit = 32  # how many pages to scrape
 page_counter = 0
 
 while page_counter < page_limit:

@@ -13,6 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 // import { Separator } from '@/components/ui/separator';
 import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
 
+import jobListings from "../../../../data/alljobs.json"; // adjust path as needed
+
 // interface ProfileData {
 //   personalInfo: {
 //     fullName: string;
@@ -120,18 +122,39 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log('Submitting profile with file:', uploadedFile);
+  
     try {
       const formData = new FormData();
+  
       if (uploadedFile) {
-        formData.append('file', uploadedFile);
+        formData.append("resume_pdf", uploadedFile);
+      } else {
+        alert("Please upload your resume first.");
+        return;
       }
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        body: formData
-      })
+  
+      const jobListingsBlob = new Blob([JSON.stringify(jobListings)], {
+        type: "application/json",
+      });
+      formData.append("job_listings_json", jobListingsBlob, "job_listings.json");
+  
+      const response = await fetch("http://127.0.0.1:8000/find_highest_cos_sim", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+  
+      const sortedJobs = await response.json();
+      console.log("Sorted job listings:", sortedJobs);
+  
+      // Save the results in sessionStorage instead of URL
+      sessionStorage.setItem("jobResults", JSON.stringify(sortedJobs));
+  
+      // Redirect to results page
+      router.push("/results");
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error("Error uploading files:", error);
     } finally {
       setIsLoading(false);
     }

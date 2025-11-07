@@ -51,11 +51,9 @@ export default function ProfilePage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessingCV, setIsProcessingCV] = useState(false);
   const [isProfileUploaded, setIsProfileUploaded] = useState<boolean>(false);
+  const [matchJobs, setMatchJobs] = useState<Array<any>>([]);
 
   // Load existing profile on component mount
-
-
-
 
   const handleMethodChoice = (method: 'manual' | 'upload') => {
     setShowMethodChoice(true);
@@ -222,7 +220,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Single card for status and buttons */}
-          <Card className="flex flex-col justify-center p-8 max-w-md mx-auto cursor-pointer hover:border-primary transition-colors">
+          <Card className="flex flex-col justify-center p-8 max-w-md mx-auto hover:border-primary transition-colors">
             <p className="mb-6 text-center text-lg font-medium">
               {isProfileUploaded ? 'Profile Uploaded' : 'Please upload profile'}
             </p>
@@ -230,7 +228,7 @@ export default function ProfilePage() {
               File name: {uploadedFile?.name || 'None'}
             </p>
             <div className="flex justify-center space-x-6">
-              <Button className="w-28" size="lg" onClick={handleSubmit} disabled={!isProfileUploaded || isProcessingCV}>
+              <Button className="w-28 cursor-pointer" size="lg" onClick={handleSubmit} disabled={!isProfileUploaded || isProcessingCV}>
                 Submit
               </Button>
             </div>

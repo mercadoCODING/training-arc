@@ -16,7 +16,7 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Search className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">JobMatch AI</span>
+            <span className="text-lg font-semibold">JobMatch.AI</span>
           </div>
           {/* <Button variant="ghost">Sign In</Button> */}
         </div>
@@ -28,7 +28,7 @@ export default function Home() {
           {/* Hero Title */}
           <div className="space-y-4">
             <h1 className="text-6xl md:text-7xl font-bold tracking-tight">
-              JobMatch <span className="text-primary">.AI</span>
+              JobMatch<span className="text-primary">.AI</span>
             </h1>
             <p className="text-muted-foreground text-lg">
               Revolutionizing job search with artificial intelligence.

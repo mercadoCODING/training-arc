@@ -31,10 +31,11 @@ base_url = "https://ph.jobstreet.com/jobs"
 driver.get(base_url)
 
 all_jobs = [] #create a list of dictionaries then save data to all_jobs.json
-page_limit = 32  # how many pages to scrape
+job_limit = 5  # how many jobs to scrape
+job_counter = 0
 page_counter = 0
 
-while page_counter < page_limit:
+while job_counter < job_limit:
     page_counter += 1
     print(f"SCRAPING PAGE {page_counter}")
 
@@ -47,6 +48,12 @@ while page_counter < page_limit:
 
     #once all cards have loaded:
     for idx, card in enumerate(job_cards, start=1):
+
+        if job_counter < job_limit:
+            job_counter += 1
+        else:
+            break
+
         try:
             # Scroll to the card to ensure it's visible
             driver.execute_script("arguments[0].scrollIntoView(true);", card)

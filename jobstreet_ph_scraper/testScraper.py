@@ -108,14 +108,15 @@ else:
     print("  ✓ Page loaded successfully\n")
 
 all_jobs = []  # List to store all scraped jobs
-page_limit = 5  # Number of pages to scrape
+job_limit = 5  # Number of pages to scrape
+job_counter = 0
 page_counter = 0
 
 print("=" * 80)
 print("Starting job extraction...")
 print("=" * 80)
 
-while page_counter < page_limit:
+while job_counter < job_limit:
     page_counter += 1
     print(f"\n[PAGE {page_counter}] Scraping...")
 
@@ -133,6 +134,10 @@ while page_counter < page_limit:
 
     # Process each job card
     for idx, card in enumerate(job_cards, start=1):
+        if job_counter < job_limit:
+            job_counter += 1
+        else:
+            break
         try:
             # Human-like smooth scroll to card
             driver.execute_script("""

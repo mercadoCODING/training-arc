@@ -1,13 +1,15 @@
-# Use Python 3.11 base image
+# ==========================
+# Base image
+# ==========================
 FROM python:3.11-slim
 
-# Install dependencies for Chrome
+# ==========================
+# Install system dependencies for Chrome + Selenium
+# ==========================
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
-    gnupg \
-    ca-certificates \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -26,24 +28,48 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome stable
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
- && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
- && apt-get update && apt-get install -y google-chrome-stable \
- && rm -rf /var/lib/apt/lists/*
+# ==========================
+# Install Google Chrome (latest stable) without apt-key
+# ==========================
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get update \
+    && apt-get install -y ./google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb \
+    && rm -rf /var/lib/apt/lists/*
 
+# ==========================
+# Install Chromedriver (matches Chrome version)
+# ==========================
+RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1) \
+    && DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}") \
+    && wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip" \
+    && unzip chromedriver_linux64.zip \
+    && mv chromedriver /usr/bin/chromedriver \
+    && chmod +x /usr/bin/chromedriver \
+    && rm chromedriver_linux64.zip
+
+# ==========================
 # Set working directory
+# ==========================
 WORKDIR /app
 
-# Copy scraper code into container
+# ==========================
+# Copy scraper code
+# ==========================
 COPY . .
 
+# ==========================
 # Install Python dependencies
+# ==========================
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variable for headless Chrome if needed
+# ==========================
+# Environment variables for headless Chrome
+# ==========================
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV DISPLAY=:99
 
-# Entry point
+# ==========================
+# Run scraper
+# ==========================
 CMD ["python", "jobstreet_scraper.py"]

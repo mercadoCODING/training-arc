@@ -23,7 +23,7 @@ resume = """ Software engineer, developer, and problem-solver with a curiosity a
 options = Options()
 options.add_argument("--start-maximized") #starts chrome maximized to avoid clickable errors with responsive layouts
 
-# options.add_argument("--headless=new")  # Uncomment to run chrome without visible window
+options.add_argument("--headless=new")  # Uncomment to run chrome without visible window
 
 driver = webdriver.Chrome(
     service=Service(ChromeDriverManager().install()),

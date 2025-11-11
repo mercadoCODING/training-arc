@@ -51,7 +51,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the scraper script
-COPY scraper.py .
+COPY jobstreet_scraper.py .
 
 # Set environment variables
 ENV CHROME_BIN=/usr/bin/google-chrome
@@ -60,4 +60,4 @@ ENV CHROME_BIN=/usr/bin/google-chrome
 RUN mkdir -p /app/output
 
 # Run the scraper
-CMD ["python", "scraper.py"]
+CMD ["python", "jobstreet_scraper.py"]

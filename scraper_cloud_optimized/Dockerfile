@@ -8,7 +8,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
-    unzip \
     curl \
     ca-certificates \
     fonts-liberation \
@@ -32,25 +31,18 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
-    --no-install-recommends
-
-# Install Google Chrome Stable
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
+    --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver
-RUN CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) \
-    && wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" \
-    && unzip chromedriver_linux64.zip \
-    && mv chromedriver /usr/bin/chromedriver \
-    && chmod +x /usr/bin/chromedriver \
-    && rm chromedriver_linux64.zip
+# Install Google Chrome Stable
+RUN wget -q -O /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get update \
+    && apt-get install -y /tmp/google-chrome-stable_current_amd64.deb \
+    && rm /tmp/google-chrome-stable_current_amd64.deb \
+    && rm -rf /var/lib/apt/lists/*
 
-# Verify installations
-RUN google-chrome --version && chromedriver --version
+# Verify Chrome installation
+RUN google-chrome --version
 
 # Copy requirements file
 COPY requirements.txt .
@@ -61,9 +53,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the scraper script
 COPY scraper.py .
 
-# Set environment variables for Chrome
-ENV CHROME_BIN=/usr/bin/google-chrome \
-    CHROMEDRIVER_PATH=/usr/bin/chromedriver
+# Set environment variables
+ENV CHROME_BIN=/usr/bin/google-chrome
 
 # Create directory for screenshots and output
 RUN mkdir -p /app/output

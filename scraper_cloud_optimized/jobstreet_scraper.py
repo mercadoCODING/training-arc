@@ -39,9 +39,8 @@ options.add_argument("--disable-popup-blocking")
 # Explicitly tell Selenium where Chrome is
 options.binary_location = "/usr/bin/google-chrome"
 
-# Use system chromedriver if available (common in Docker)
-service = Service("/usr/bin/chromedriver")
-driver = webdriver.Chrome(service=service, options=options)
+# Let Selenium Manager auto-detect ChromeDriver
+driver = webdriver.Chrome(options=options)
 
 # ============================================
 # HIDE WEBDRIVER PROPERTY (MOST CRITICAL!)
@@ -108,7 +107,7 @@ else:
     print("  ✓ Page loaded successfully\n")
 
 all_jobs = []  # List to store all scraped jobs
-job_limit = 5  # Number of pages to scrape
+job_limit = 5000  # Number of pages to scrape
 job_counter = 0
 page_counter = 0
 

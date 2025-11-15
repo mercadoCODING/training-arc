@@ -12,9 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-# ============================================
 # ENHANCED STEALTH CHROME OPTIONS
-# ============================================
 options = Options()
 options.add_argument("--headless=new")  # Headless mode
 options.add_argument("--no-sandbox")  # Required for Docker/cloud environments
@@ -42,9 +40,7 @@ options.binary_location = "/usr/bin/google-chrome"
 # Let Selenium Manager auto-detect ChromeDriver
 driver = webdriver.Chrome(options=options)
 
-# ============================================
 # HIDE WEBDRIVER PROPERTY (MOST CRITICAL!)
-# ============================================
 driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
     'source': '''
         Object.defineProperty(navigator, 'webdriver', {
@@ -76,9 +72,7 @@ driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
     '''
 })
 
-# ============================================
 # START SCRAPING
-# ============================================
 base_url = "https://ph.jobstreet.com/jobs"
 
 print("=" * 80)

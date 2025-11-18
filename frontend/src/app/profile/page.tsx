@@ -3,46 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Textarea } from '@/components/ui/textarea';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { Checkbox } from '@/components/ui/checkbox';
-// import { Badge } from '@/components/ui/badge';
-// import { Separator } from '@/components/ui/separator';
 import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
 
-import jobListings from "../../../../data/alljobs.json"; // adjust path as needed
-
-// interface ProfileData {
-//   personalInfo: {
-//     fullName: string;
-//     email: string;
-//     phone: string;
-//     location: string;
-//   };
-//   experience: {
-//     yearsOfExperience: string;
-//     currentPosition: string;
-//     industry: string;
-//     experienceLevel: string;
-//   };
-//   education: {
-//     degree: string;
-//     field: string;
-//     university: string;
-//     graduationYear: string;
-//   };
-//   skills: string[];
-//   preferences: {
-//     desiredPosition: string;
-//     preferredLocation: string;
-//     salaryRange: string;
-//     jobType: string;
-//     workArrangement: string;
-//   };
-// }
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -99,24 +62,6 @@ export default function ProfilePage() {
     }
   };
 
-
-  // const addSkill = () => {
-  //   if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-  //     setFormData(prev => ({
-  //       ...prev,
-  //       skills: [...prev.skills, newSkill.trim()]
-  //     }));
-  //     setNewSkill('');
-  //   }
-  // };
-
-  // const removeSkill = (skillToRemove: string) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     skills: prev.skills.filter(skill => skill !== skillToRemove)
-  //   }));
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -130,38 +75,29 @@ export default function ProfilePage() {
         alert("Please upload your resume first.");
         return;
       }
-  
-      const jobListingsBlob = new Blob([JSON.stringify(jobListings)], {
-        type: "application/json",
-      });
-      formData.append("job_listings_json", jobListingsBlob, "job_listings.json");
-  
-      const response = await fetch("http://127.0.0.1:8000/find_highest_cos_sim", {
+
+      const response = await fetch("https://job-matcher-api-1019829241078.asia-southeast1.run.app/match_with_gcs", {
         method: "POST",
         body: formData,
       });
-  
+      
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
-  
-      const sortedJobs = await response.json();
-      console.log("Sorted job listings:", sortedJobs);
-  
-      // Save the results in sessionStorage instead of URL
-      sessionStorage.setItem("jobResults", JSON.stringify(sortedJobs));
-  
+      
+      const results = await response.json();
+      console.log("API Response:", results);
+      
+      // Save the sorted job array (not the wrapper object)
+      sessionStorage.setItem("jobResults", JSON.stringify(results.all_matches));
+      
       // Redirect to results page
       router.push("/results");
+      
     } catch (error) {
       console.error("Error uploading files:", error);
     } finally {
       setIsLoading(false);
     }
   };
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem('userProfile');
-  //   router.push('/login');
-  // };
 
   // Method choice screen
     return (

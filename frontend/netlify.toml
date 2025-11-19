@@ -1,0 +1,6 @@
+[build]
+  command   = "npm run build"
+  publish   = ".next"  # plugin will handle SSR
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

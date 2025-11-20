@@ -52,7 +52,7 @@ export default function Home() {
           </ol>
 
           {/* CTA Buttons */}
-          <Link href={"/dashboard"}>
+          <Link href={"/profile"}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="px-8 py-3 rounded-full">
                 <Zap className="mr-2 h-4 w-4" />

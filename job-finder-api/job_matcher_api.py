@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from PyPDF2 import PdfReader
 import io
 import json
-
+    
 
 from sentence_transformers import SentenceTransformer, util
 

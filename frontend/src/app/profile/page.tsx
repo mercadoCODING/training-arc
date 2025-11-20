@@ -13,36 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 // import { Separator } from '@/components/ui/separator';
 import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
 
-import jobListings from "../../../../data/alljobs.json"; // adjust path as needed
+import jobListings from "../../../../data/1000_jobs.json"; // adjust path as needed
 
-// interface ProfileData {
-//   personalInfo: {
-//     fullName: string;
-//     email: string;
-//     phone: string;
-//     location: string;
-//   };
-//   experience: {
-//     yearsOfExperience: string;
-//     currentPosition: string;
-//     industry: string;
-//     experienceLevel: string;
-//   };
-//   education: {
-//     degree: string;
-//     field: string;
-//     university: string;
-//     graduationYear: string;
-//   };
-//   skills: string[];
-//   preferences: {
-//     desiredPosition: string;
-//     preferredLocation: string;
-//     salaryRange: string;
-//     jobType: string;
-//     workArrangement: string;
-//   };
-// }
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -98,24 +70,6 @@ export default function ProfilePage() {
       setIsProcessingCV(false);
     }
   };
-
-
-  // const addSkill = () => {
-  //   if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-  //     setFormData(prev => ({
-  //       ...prev,
-  //       skills: [...prev.skills, newSkill.trim()]
-  //     }));
-  //     setNewSkill('');
-  //   }
-  // };
-
-  // const removeSkill = (skillToRemove: string) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     skills: prev.skills.filter(skill => skill !== skillToRemove)
-  //   }));
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

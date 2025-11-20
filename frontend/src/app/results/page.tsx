@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import TopJobs from "../../components/ui/TopJobs";
+import TopJobs from "../../components/ui/topjobs";
 import { Home, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -20,10 +20,12 @@ export default function ResultsPage() {
     <header className="border-b border-border bg-card">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Button onClick={() => router.push('/')} variant="ghost" className="text-xl font-semibold">
+        <Link href = "/">
+          <Button variant="ghost" className="text-xl font-semibold">
             <Search className="h-8 w-8 text-primary" />
             JobMatchAI
           </Button>
+          </Link>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="ghost" size="sm" asChild>

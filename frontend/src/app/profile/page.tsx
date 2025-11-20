@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
 
 import jobListings from "../../../../data/1000_jobs.json"; // adjust path as needed
+import {LoadingOverlay} from "@/components/ui/loadingoverlay";
 
 
 export default function ProfilePage() {
@@ -74,7 +75,7 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       const formData = new FormData();
   
@@ -120,6 +121,7 @@ export default function ProfilePage() {
   // Method choice screen
     return (
       <div className="min-h-screen bg-background">
+        {isLoading && <LoadingOverlay/>}
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">

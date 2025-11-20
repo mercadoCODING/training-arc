@@ -49,10 +49,6 @@ export default function ProfilePage() {
     setIsProcessingCV(true);
 
     try {
-      // Simulate AI processing of CV
-      // In a real app, this would call an API to extract data from the CV
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
       // setFormData(extractedData);
     } catch (error) {
       console.error('Error processing CV:', error);

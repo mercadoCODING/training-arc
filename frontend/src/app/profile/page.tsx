@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Briefcase, GraduationCap, MapPin, DollarSign, Home, LogOut, Plus, X, Search, Upload, FileText, ChevronRight } from 'lucide-react';
+import { LoadingOverlay } from '@/components/ui/loadingoverlay';
 
 
 export default function ProfilePage() {
@@ -98,6 +99,7 @@ export default function ProfilePage() {
   // Method choice screen
     return (
       <div className="min-h-screen bg-background">
+        {isLoading && <LoadingOverlay/>}
         <header className="border-b border-border bg-card">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-2">

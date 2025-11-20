@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import TopJobs from "../../components/ui/TopJobs";
+import TopJobs from "../../components/ui/topjobs";
 
 export default function ResultsPage() {
   const [jobs, setJobs] = useState([]);

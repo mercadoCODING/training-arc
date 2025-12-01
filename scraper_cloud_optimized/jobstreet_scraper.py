@@ -88,7 +88,7 @@ time.sleep(random.uniform(3, 5))
 print("\n[DEBUG] Initial page load:")
 print(f"  Page title: {driver.title}")
 print(f"  Current URL: {driver.current_url}")
-driver.save_screenshot("debug.png")
+#driver.save_screenshot("debug.png") remove screenshots, increases memory usage in the cloud
 print(f"  Screenshot saved: debug.png")
 print(f"  Page source length: {len(driver.page_source)} characters")
 
@@ -122,7 +122,7 @@ while job_counter < job_limit:
     except Exception as e:
         print(f"  ✗ Timeout waiting for job cards: {e}")
         print(f"  Current URL: {driver.current_url}")
-        driver.save_screenshot(f"error_page_{page_counter}.png")
+        #driver.save_screenshot(f"error_page_{page_counter}.png") remove screenshots, increases memory usage in the cloud
         break
 
     # Process each job card

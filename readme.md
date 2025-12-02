@@ -3,3 +3,12 @@ This is the cloud environment for our jobstreet scraper hosted on google cloud. 
 The app is running on jobmatcherai.netlify.app, but due to budget constraints and limitations the app will only remain online until January 2026 or so. The app may take a few minutes to compute for job matches because it is deployed on a less powerful instance, and the code is to be optimized. 
 
 The local environment exists in branch dev/local-environment for testing.
+
+
+OPTIMIZATIONS (main):
+
+Avoid creation of embeddings per user request.
+
+Solutions:
+
+Let the scraper handle the creation of the embeddings by adding them as a property in the element in json. (potential issue: may exhaust resources in the instance)

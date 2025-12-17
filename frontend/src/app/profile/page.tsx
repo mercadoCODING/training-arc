@@ -72,7 +72,8 @@ export default function ProfilePage() {
         alert("Please upload your resume first.");
         return;
       }
-
+      
+      //add auth soon
       const response = await fetch("https://job-matcher-api-1019829241078.asia-southeast1.run.app/match_with_gcs", {
         method: "POST",
         body: formData,

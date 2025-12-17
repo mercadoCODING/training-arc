@@ -12,6 +12,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
+# Variables and counters
+all_jobs = []  # List to store all scraped jobs
+job_limit = 5000  # Number of pages to scrape
+job_counter = 0
+page_counter = 1
+
 # ENHANCED STEALTH CHROME OPTIONS
 options = Options()
 options.add_argument("--headless=new")  # Headless mode
@@ -37,11 +43,9 @@ options.add_argument("--disable-popup-blocking")
 # Explicitly tell Selenium where Chrome is
 options.binary_location = "/usr/bin/google-chrome"
 
-# Let Selenium Manager auto-detect ChromeDriver
-driver = webdriver.Chrome(options=options)
-
 # HIDE WEBDRIVER PROPERTY (MOST CRITICAL!)
-driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
+def hideDriverProperty(driver):
+    driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
     'source': '''
         Object.defineProperty(navigator, 'webdriver', {
             get: () => undefined
@@ -70,10 +74,27 @@ driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
                 originalQuery(parameters)
         );
     '''
-})
+    })
+
+def restartDriver():
+    global driver
+    driver.quit()
+
+    # wait 2 seconds for linux to kill the driver and release resources before creating new driver
+    time.sleep(2) # we can use psutil instead to actually wait for the process to be killed
+                  
+    driver = webdriver.Chrome(options=options) #create new driver with options
+    hideDriverProperty(driver) # for stealth
+
+def createJobUrl(page_number):
+    return f"https://ph.jobstreet.com/jobs?page={page_number}"
+
+#initialize webdriver
+driver = webdriver.Chrome(options=options)
+hideDriverProperty(driver) # for stealth
 
 # START SCRAPING
-base_url = "https://ph.jobstreet.com/jobs"
+base_url = createJobUrl(page_counter)
 
 print("=" * 80)
 print("ENHANCED STEALTH SCRAPER - Starting...")
@@ -100,21 +121,16 @@ if "Access Denied" in driver.page_source or len(driver.page_source) < 5000:
 else:
     print("  ✓ Page loaded successfully\n")
 
-all_jobs = []  # List to store all scraped jobs
-job_limit = 5000  # Number of pages to scrape
-job_counter = 0
-page_counter = 0
-
 print("=" * 80)
 print("Starting job extraction...")
 print("=" * 80)
 
 while job_counter < job_limit:
-    page_counter += 1
     print(f"\n[PAGE {page_counter}] Scraping...")
 
     # Wait for job cards (article tags) to load
     try:
+        #initializes a job_cards list of WebELements (pointers to the article tags)
         job_cards = WebDriverWait(driver, 30).until(
             EC.presence_of_all_elements_located((By.TAG_NAME, "article"))
         )
@@ -206,36 +222,19 @@ while job_counter < job_limit:
             })
 
             print(f"  ✓ [{idx}/{len(job_cards)}] {title}")
-
         except Exception as e:
             print(f"  ✗ [{idx}/{len(job_cards)}] Failed: {e}")
             continue
 
-    # Try to go to next page
-    try:
-        # Human-like delay before clicking next
-        time.sleep(random.uniform(2, 4))
-        
-        next_btn = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[aria-label='Next']"))
-        )
-        
-        # Scroll to next button naturally
-        driver.execute_script("""
-            arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});
-        """, next_btn)
-        
-        time.sleep(random.uniform(0.5, 1.0))
-        
-        # Click next button
-        driver.execute_script("arguments[0].click();", next_btn)
-        
-        # Wait for page to load
-        time.sleep(random.uniform(3, 5))
-        
-    except Exception as e:
-        print(f"\n  → No more pages or reached limit: {e}")
-        break
+    # Restart the driver every 10 pages to avoid memory leaks then move to the next page
+    if page_counter % 10 == 0:
+        print("Restarting driver to free up resources...")
+        restartDriver()
+
+    page_counter += 1
+
+    # navigate to next page
+    driver.get(createJobUrl(page_counter))
 
 driver.quit()
 

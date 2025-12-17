@@ -14,7 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # Variables and counters
 all_jobs = []  # List to store all scraped jobs
-job_limit = 5000  # Number of pages to scrape
+job_limit = 1000  # Number of pages to scrape
 job_counter = 0
 page_counter = 1
 
